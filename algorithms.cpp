@@ -57,6 +57,24 @@ bool func(T value){
         return false;
     }
 }
+template<typename T>
+bool is_sorted(T begin, size_t size, bool(*bubbleSort)(T, size_t)){//отсортировано ли?
+    if(bubbleSort(*begin, size)==false){
+       return false; 
+    }
+    else{
+        return true;
+    }
+
+}
+template < typename T >
+bool bubbleSort(T arr, size_t arrSize){
+    for(size_t i = 0; i < arrSize - 1; ++i)
+        for(size_t j = 0; j < arrSize - 1; ++j)
+            if (arr[j + 1] < arr[j])
+                return false;
+                //my_swap ( arr[j] , arr[j+1] ) ;
+}
 
 int main(){
     int array[]={8,7,6,5};
