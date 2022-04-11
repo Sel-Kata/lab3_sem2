@@ -76,7 +76,7 @@ bool bubbleSort(T& arr, size_t arrSize){
                 //my_swap ( arr[j] , arr[j+1] ) ;
 }
 template<typename T>
-T find_not(T begin, T end,T faund,  bool(*func2)(T,T)){//находит первое не равное заданому
+T& find_not(T begin, T end,T faund,  bool(*func2)(T,T)){//находит первое не равное заданому
     int count=0;
     while(begin!=end){
         if(func2(*begin, *faund)==true){
@@ -90,7 +90,7 @@ T find_not(T begin, T end,T faund,  bool(*func2)(T,T)){//находит перв
     return NULL;
 }
 template<typename T>
-T find_backward(T begin, T end,T faund,  bool(*func2)(T,T)){//находит первый эл равный заданому с конца
+T& find_backward(T begin, T end,T faund,  bool(*func2)(T,T)){//находит первый эл равный заданому с конца
     int count=0;
     while(end!=begin){
         if(func2(*end, *faund)==false){
