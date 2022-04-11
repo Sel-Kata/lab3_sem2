@@ -1,23 +1,23 @@
 #include <iostream>
-
+template<typename T>
 class Buffer{
 private:
-    int begin_;
-    int end_;
+    T begin_;
+    T end_;
     int size_of_array_;
     int data_size_;
-    int array_[10000];//max=1000
+    T array_[10000];//max=1000
 
 public:
     ///сеттеры
-    void setBuf(const int& place, const int& meaning){//поставить значение в опред.место в буфере
+    void setBuf(const T& place, const T& meaning){//поставить значение в опред.место в буфере
         array_[place] = meaning;
     }
-    void setStart(const int& start){
+    void setStart(const T& start){
         begin_ = start;
     }
 
-    void setFinish(const int& finish){
+    void setFinish(const T& finish){
         end_ = finish;
     }
 
@@ -51,29 +51,29 @@ public:
         }
     }
     ////геттеры
-    int getSize() const {
+    T getSize() const {
         return data_size_;
     }
 
-    int getStart() const {
+    T getStart() const {
         return begin_;
     }
 
-    int getFinish() const {
+    T getFinish() const {
         return end_;
     }
-    int getBuf(const int& place) const {
+    T getBuf(const int& place) const {
         return array_[place];
     }
-    int get_array_size() const {
+    T get_array_size() const {
         return size_of_array_;
     }
 
-    int getBegin() const{
+    T getBegin() const{
         return array_[getStart()];
     }
 
-    int getEnd() const {
+    T getEnd() const {
         return array_[getFinish()];
     }
 
@@ -84,7 +84,7 @@ public:
         this->set_array_size(5);
     }
 
-    Buffer(int array[], const int& size){
+    Buffer(T array[], const int& size){
         this->set_array_size(size);
         for (int cur = 0; cur < size; ++cur){
             this->setBuf(cur, array[cur]);
@@ -94,7 +94,7 @@ public:
         this->setStart(0);
     }
 
-    void insert_end(const int& value){
+    void insert_end(const T& value){
         if (getSize() + 1 <= get_array_size()){//если есть место свободное
             setFinish(getFinish() + 1);
             setBuf(getFinish(), value);
@@ -134,9 +134,10 @@ public:
         setStart(getStart() + 1);
         setSize(getSize() - 1);
     }
+    friend std::ostream& operator<< (std::ostream& stream, const Buffer<T, T, int, int, T>& buff);
 };
 
-std::ostream& operator<< (std::ostream& stream, const Buffer& buff){
+std::ostream& operator<< (std::ostream& stream, const Buffer<T, T, int, int, T>& buff){
     if(buff.getSize() == 1){
         stream << buff.getBuf(buff.getFinish());
     }
