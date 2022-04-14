@@ -2,7 +2,6 @@
 #include <vector>
 #include <algorithm>
 
-
 namespace ty{
     template<class T>
     class equal_to{
@@ -154,52 +153,24 @@ namespace rp{
     }
 }
 
-struct mydot{
-    int x_;
-    int y_;
-};
+struct MyPoint{
+    int x;
+    int y;
 
-class point{
-private:
-    mydot dot_;
-
-public:
-    //конструктор
-    point (int x = 0, int y = 0){
-        this->set_x(x);
-        this->set_y(y);
+    MyPoint(){
+        int x, y = 0;
     }
-    //оператор присваивания
-    point& operator=(const point &point_New2){
-        this->set_x(point_New2.getx());
-        this->set_y(point_New2.gety());
-        return *this;
+    MyPoint(int first, int second){
+        this->x = first;
+        this->y = second;
     }
-    //конструктор копирования
-    point (const point &point_New){
-        this->set_x(point_New.getx());
-        this->set_y(point_New.gety());
+    MyPoint(const MyPoint & newPoint){
+        this->x = newPoint.x;
+        this->y = newPoint.y;
     }
-    void set_y(const int& y){
-        this->dot_.y_ = y;
+    bool operator == (const MyPoint & newPoint){
+        return  this->y == newPoint.y && this->x == newPoint.x;
     }
-    void set_x(const int& x){
-        this->dot_.x_ = x;
-    }
-
-    int gety() const{
-        return this->dot_.y_;
-    }
-    int getx() const{
-        return this->dot_.x_;
-    }
-
-    mydot getPoint(){
-        return this->dot_;
-    }
-    //деструктор
-    ~point()
-    {}
 };
 
 int main()
@@ -233,15 +204,14 @@ int main()
     std::cout <<"find_backward?\n";
     std::cout <<rp::find_backward(r, t, r.rbegin(), r.rbegin(), 7)<<"\n";//rbegin-обратный
 
-
-    point first(2, 1);
-    point second(3, 2);
-    point third(4, 3);
-    std::vector<point> mypoint;
+    std::vector<MyPoint> mypoint;
+    MyPoint first;
+    MyPoint second;
+    MyPoint third;
     mypoint.push_back(first);
     mypoint.push_back(second);
     mypoint.push_back(third);
-    ty::equal_to<point> forPoint;
+    ty::equal_to<MyPoint> forPoint;
     if (forPoint(first,second)){
         std::cout << "true";
     }
@@ -252,6 +222,7 @@ int main()
     std::cout <<rp::any_of(mypoint, forPoint, third)<<"\n";
     std::cout <<"none_of?\n";
     std::cout <<rp::none_of(mypoint, forPoint, third)<<"\n";
+    return 0;
     return 0;
 }
 
