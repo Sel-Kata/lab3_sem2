@@ -1,187 +1,165 @@
 #include <iostream>
-template<typename T>
+#include <algorithm>
+
+template <class T>
 class Buffer{
+public:
+    Buffer(int size){
+        if (size < 0){exit(1);}
+        this->end = nullptr;
+        this->first = nullptr;
+        this->size = size;
+    }
+
+    void push_first(T Data){
+        Buffer<T>::Node* temp;
+        temp = temp->createNode(Data);
+        counterOfElements++;
+        if (this->first == nullptr && counterOfElements <= size){
+            this->first = temp;
+            this->end = temp;
+        }
+        else if (this->first != nullptr && counterOfElements <= size){
+            this->first->prev = temp;
+            temp->next = this->first;
+            this->first = temp;
+        }
+        else if (this->first != nullptr && counterOfElements >= size){
+            this->end = this->end->prev;
+            this->first->prev = temp;
+            temp->next = this->first;
+            this->first = temp;
+        }
+    }
+
+    int Size(){
+        return this->counterOfElements;
+    }
+
+    void pop_first(){
+        if (first == nullptr){return;}
+        else{
+            first = first->next;
+            counterOfElements--;
+        }
+    }
+
+    void resize(int size){
+        if (this->size < 0){exit(1);}
+        if (counterOfElements < size){
+            this->size = size;
+        }
+        if (size < this->counterOfElements){
+            int len = this->counterOfElements - size;
+            for(int i = 0; i < len; i++){
+                this->end = this->end->prev;
+                this->counterOfElements--;
+            }
+            this->size = size;
+        }
+    }
+
+    void push_back(T Data){
+        Buffer<T>::Node* temp;
+        temp = temp->createNode(Data);
+        counterOfElements++;
+        if (this->first == nullptr && counterOfElements <= this->size){
+            this->first = temp;
+            this->end = temp;
+        }
+        else if (this->first != nullptr){
+            this->end->next = temp;
+            temp->prev = this->end;
+            this->end = temp;
+        }
+    }
+
+    void pop_back(){
+        if (end != nullptr){
+            this->end = this->end->prev;
+            this->counterOfElements--;
+        }
+    }
+
+    T operator [](int index){
+        if (index > counterOfElements){exit(1);}
+        Node* temp;
+        temp = this->first;
+        for (int i = 0; i < index; i++){
+            temp = temp->next;
+        }
+
+        return temp->GetData();
+    }
+    
+    ~Buffer(){
+        this->end = nullptr;
+        this->first = nullptr;
+    }
 private:
-    T begin_;
-    T end_;
-    int size_of_array_;
-    int data_size_;
-    T array_[10000];//max=1000
+    class Node{
+    public:
+        Node(){
+            this->next = nullptr;
+            this->prev = nullptr;
+        }
+        static Buffer<T>::Node* createNode(T Data){
+            Buffer<T>::Node* temp = new Buffer<T>::Node;
+            temp->data = Data;
+            return temp;
+        }
+
+        T GetData(){
+            return this->data;
+        }
+
+        void SetData(T data){ this->data = data;}
+
+        ~Node(){
+            this->next = nullptr;
+            this->prev = nullptr;
+        }
+
+        Node* prev;
+        Node* next;
+    private:
+        T data;
+    };
+    Node* first;
+    Node* end;
+    int size = 0;
+    int counterOfElements = 0;
 
 public:
-    ///сеттеры
-    void setBuf(const T& place, const T& meaning){//поставить значение в опред.место в буфере
-        array_[place] = meaning;
+    T* Begin(){
+        T temp = this->first->GetData();
+        T* t = &temp;
+        return t;
     }
-    void setStart(const T& start){
-        begin_ = start;
+    T* End(){
+        T temp = this->end->GetData();
+        T* t = &temp;
+        return t;
     }
-
-    void setFinish(const T& finish){
-        end_ = finish;
-    }
-
-    void setSize(int dataSize){
-        data_size_ = dataSize;
-    }
-
-    void set_array_size(int new_size){/// закончить потом
-        if (new_size > get_array_size()){//если хотим задать больше чем у нас было
-            if (getSize() < get_array_size()){
-                size_of_array_ = new_size;
-            }
-            else{
-                size_of_array_ = new_size;
-                if (getSize() + getFinish() < new_size){
-                    int temp=0;
-                    while(temp < getFinish()){
-                        setBuf(getSize(), getBuf(temp));
-                        setSize(getSize() + 1);
-                        temp++;
-                    }
-                }
-            }
-        }
-        else if (new_size < get_array_size()){
-            std::cout << "Точно хотим уменьшить буффер??"<<"\n";
-
-        }
-        else if(new_size == get_array_size()){
-            std::cout << "Установленный размер уже такой"<<"\n";
-        }
-    }
-    ////геттеры
-    T getSize() const {
-        return data_size_;
-    }
-
-    T getStart() const {
-        return begin_;
-    }
-
-    T getFinish() const {
-        return end_;
-    }
-    T getBuf(const int& place) const {
-        return array_[place];
-    }
-    T get_array_size() const {
-        return size_of_array_;
-    }
-
-    T getBegin() const{
-        return array_[getStart()];
-    }
-
-    T getEnd() const {
-        return array_[getFinish()];
-    }
-
-    Buffer(){//создание
-        this->setStart(0);
-        this->setSize(0);
-        this->setFinish(-1);
-        this->set_array_size(5);
-    }
-
-    Buffer(T array[], const int& size){
-        this->set_array_size(size);
-        for (int cur = 0; cur < size; ++cur){
-            this->setBuf(cur, array[cur]);
-        }
-        this->setSize(size);
-        this->setFinish(size - 1);
-        this->setStart(0);
-    }
-
-    void insert_end(const T& value){
-        if (getSize() + 1 <= get_array_size()){//если есть место свободное
-            setFinish(getFinish() + 1);
-            setBuf(getFinish(), value);
-            setSize(getSize() + 1);
-        }
-        else{//если место нет,берём начало
-            setFinish(getStart());
-            setBuf(getFinish(), value);
-            setStart(getStart() + 1);
-        }
-    }
-
-    void delete_end(){
-        setFinish(getFinish() - 1);
-        setSize(getSize() - 1);
-    }
-
-    void insert_begin(const int & value){ ///что-то не так!!!!
-        if (getStart() + 1 <= get_array_size()){//если он ещё не образует кольцо
-            for (int i = getFinish() ; i >= getStart(); --i){
-                setBuf(i + 1, getBuf(i));
-            }
-            setFinish(getFinish() + 1);
-            setBuf(getStart(), value);
-            setSize(getSize() + 1);
-        }
-        else {//когда замкнутая цепь,то...
-            for (int i  = getFinish(); i > getStart(); --i){//сдвигаем
-                setBuf(i + 1, getBuf(i));
-            }
-            setStart(getStart() - 1);
-            setBuf(getStart(), value);
-        }
-    }
-
-    void delete_begin(){
-        setStart(getStart() + 1);
-        setSize(getSize() - 1);
-    }
-    friend std::ostream& operator<< (std::ostream& stream, const Buffer<T, T, int, int, T>& buff);
 };
-
-std::ostream& operator<< (std::ostream& stream, const Buffer<T, T, int, int, T>& buff){
-    if(buff.getSize() == 1){
-        stream << buff.getBuf(buff.getFinish());
-    }
-    else if (buff.getSize() == 0){
-        return stream;
-    }
-    else if (buff.getStart() < buff.getFinish()){
-        if(buff.getSize() <= buff.get_array_size()){
-            for (int i = buff.getStart(); i <= buff.getFinish(); ++ i){
-                stream << buff.getBuf(i) << ", ";
-            }
-        }
-    }
-    else {
-        for (int i = buff.getStart(); i < buff.get_array_size(); ++i){
-            stream << buff.getBuf(i) << ", ";
-        }
-        for (int i = 0; i <= buff.getFinish(); ++i){
-            stream << buff.getBuf(i) << ", ";
-        }
-    }
-    return stream;
-};
-
 
 int main(){
-    Buffer bufer;
-    std::cout << bufer << "size: " << bufer.getSize() << std::endl;
-    bufer.insert_end(5);
-    std::cout <<"buf.insert_end(5)\t" << bufer << "\tразмер: " << bufer.getSize() << std::endl;
-    bufer.insert_begin(3);
-    std::cout <<"buf.insert_begin(3)\t" << bufer << "\tразмер: " << bufer.getSize() << std::endl;
-    bufer.insert_end(6);
-    std::cout << "buf.insert_end(6)\t" << bufer << "\tразмер: " << bufer.getSize() << std::endl;
-    bufer.insert_end(7);
-    std::cout << "buf.insert_end(7)\t" << bufer << "\tразмер: " << bufer.getSize() << std::endl;
-    bufer.insert_end(2);
-    std::cout << "buf.insert_end(2)\t" << bufer << "\tразмер: " << bufer.getSize() << std::endl;
-    //bufer.delete_end();
-    //std::cout << "buf.delete_end();\t" << bufer << "\размер: " << bufer.getSize() << std::endl;
-    bufer.insert_end(1);
-    std::cout << "buf.insert_end(1)\t" << bufer << "\tразмер: " << bufer.getSize() << std::endl;
-    //bufer.delete_begin();
-    //std::cout << "buf.delete_begin();\t" << bufer << "\размер: " << bufer.getSize() << std::endl;
-    //bufer.insert_begin(7);
-    //std::cout << "buf.insert_begin(7)\t" << bufer << "\размер: " << bufer.getSize() << std::endl;
+    Buffer<int> t(9);
+    t.push_first(6);
+    t.push_first(0);
+    t.push_first(4);
+    t.push_back(7);
+    t.pop_back();
+    t.push_back(5);
+    t.pop_first();
+    t.resize(10);
+    t.resize(2);
+    for (int i = 0; i < t.Size(); i++){
+        std::cout << t[i] << " ";
+    }
+    std::cout << std::endl;
+    std::cout << *t.Begin() << " " << *t.End();
+    //std::none_of(t.Begin(), t.End(), 8);
+    return 0;
+
 }
