@@ -117,7 +117,7 @@ template<typename T>
 bool is_palindrome(T begin, T end){//палидром ли
     if (begin < end){
             for ( ; begin <= end; ++begin, --end){
-                if (get_buf(begin) != get_buf(end))
+                if (begin != end)
                     return false;
             }
         }
