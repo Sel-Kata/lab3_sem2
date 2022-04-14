@@ -5,9 +5,12 @@ template <class T>
 class Buffer{
 public:
     Buffer(int size){
-        if (size < 0){exit(1);}
+        if (size < 0){
+            exit(1);
+        }
         this->end = nullptr;
         this->first = nullptr;
+        this->delitedForPushBack = nullptr;
         this->size = size;
     }
 
@@ -45,7 +48,9 @@ public:
     }
 
     void resize(int size){
-        if (this->size < 0){exit(1);}
+        if (this->size < 0){
+            exit(1);
+        }
         if (counterOfElements < size){
             this->size = size;
         }
@@ -63,11 +68,19 @@ public:
         Buffer<T>::Node* temp;
         temp = temp->createNode(Data);
         counterOfElements++;
-        if (this->first == nullptr && counterOfElements <= this->size){
+        if (this->first == nullptr && counterOfElements <= this->size){//первый элем
             this->first = temp;
             this->end = temp;
         }
-        else if (this->first != nullptr){
+        else if (this->first != nullptr && counterOfElements <= this->size){//не первый но не заполнен
+            this->end->next = temp;
+            temp->prev = this->end;
+            this->end = temp;
+        }
+        if (counterOfElements > this->size){//уже заполнен
+            counterOfElements--;
+            this->first = this->first->next;
+            this->first->prev = nullptr;
             this->end->next = temp;
             temp->prev = this->end;
             this->end = temp;
@@ -82,7 +95,9 @@ public:
     }
 
     T operator [](int index){
-        if (index > counterOfElements){exit(1);}
+        if (index > counterOfElements){
+            exit(1);
+        }
         Node* temp;
         temp = this->first;
         for (int i = 0; i < index; i++){
@@ -91,10 +106,11 @@ public:
 
         return temp->GetData();
     }
-    
+
     ~Buffer(){
         this->end = nullptr;
         this->first = nullptr;
+        this->delitedForPushBack = nullptr;
     }
 private:
     class Node{
@@ -113,7 +129,8 @@ private:
             return this->data;
         }
 
-        void SetData(T data){ this->data = data;}
+        void SetData(T data)
+        { this->data = data;}
 
         ~Node(){
             this->next = nullptr;
@@ -127,23 +144,86 @@ private:
     };
     Node* first;
     Node* end;
+    Node* delitedForPushBack;
     int size = 0;
     int counterOfElements = 0;
 
 public:
-    T* Begin(){
-        T temp = this->first->GetData();
-        T* t = &temp;
-        return t;
+
+    Buffer<T>::Node* getNodeForIter(int index){
+        if (index > counterOfElements){
+            exit(1);
+        }
+
+        Node* temp;
+        temp = this->first;
+
+        for (int i = 0; i < index; i++){
+            temp = temp->next;
+        }
+
+        return temp;
     }
-    T* End(){
-        T temp = this->end->GetData();
-        T* t = &temp;
-        return t;
+    class iter{
+        friend class Buffer<T>;
+    public:
+        iter(){ this->data = nullptr;}
+        iter(Buffer<T>::Node* temp){ this->data = temp;}
+
+        iter& operator++(){
+            if (data->next != nullptr){
+                this->data = this->data->next;
+            }
+            return *this;
+        }
+
+        iter& operator = (const iter& other){
+            this->data->prev = other.data->prev;
+            this->data->next = other.data->prev;
+            this->data->SetData(other.data->GetData());
+            return *this;
+        }
+
+        iter& operator--(){
+            if (this->data->prev != nullptr){
+                this->data = this->data->prev;
+            }
+            return *this;
+        }
+
+        T operator * (){
+            if (this->data != nullptr){
+                return this->data->GetData();
+            }
+        }
+
+        bool operator == (const iter& other){
+            if (this->data->prev == other.data->prev && this->data->next == other.data->next && this->data->GetData() == other.data->GetData()){
+                return true;
+            }
+            return false;
+        }
+
+        bool operator != (const iter& other){
+            return (!(this->operator==(other)));
+        }
+    private:
+        Buffer<T>::Node* data;
+    };
+
+    iter start(){
+        iter temp(this->first);
+        return temp;
     }
+    iter finish(){
+        iter temp(this->end);
+        return temp;
+    }
+
 };
 
-int main(){
+int main()
+{
     Buffer<int> t(9);
     t.push_first(6);
     t.push_first(0);
@@ -154,12 +234,25 @@ int main(){
     t.pop_first();
     t.resize(10);
     t.resize(2);
+    for (int i = 0; i < t.Size(); i++)
+    {
+        std::cout << t[i] << " ";
+    }
+    std::cout << std::endl;
+    t.resize(5);
+    t.push_back(5);
+    t.push_back(9);
+    t.push_back(1);
+    t.push_back(4);
     for (int i = 0; i < t.Size(); i++){
         std::cout << t[i] << " ";
     }
     std::cout << std::endl;
-    std::cout << *t.Begin() << " " << *t.End();
-    //std::none_of(t.Begin(), t.End(), 8);
+    Buffer<int>::iter it_b = t.start();
+    Buffer<int>::iter it_e = t.finish();
+    std::cout << *it_b << std::endl;
+    std::cout << std::none_of(it_b, it_e, [](int i = 0){return i == 1;});
     return 0;
 
 }
+
