@@ -6,6 +6,7 @@ class Buffer{
 public:
     Buffer(int size){
         if (size < 0){
+            std::cout <<"невозможно поставить отрицательный размер буфера\n";
             exit(1);
         }
         this->end = nullptr;
@@ -14,7 +15,7 @@ public:
         this->size = size;
     }
 
-    void push_first(T Data){
+    void insert_first(T Data){
         Buffer<T>::Node* temp;
         temp = temp->createNode(Data);
         counterOfElements++;
@@ -39,7 +40,7 @@ public:
         return this->counterOfElements;
     }
 
-    void pop_first(){
+    void delite_first(){
         if (first == nullptr){return;}
         else{
             first = first->next;
@@ -64,7 +65,7 @@ public:
         }
     }
 
-    void push_back(T Data){
+    void insert_back(T Data){
         Buffer<T>::Node* temp;
         temp = temp->createNode(Data);
         counterOfElements++;
@@ -77,7 +78,10 @@ public:
             temp->prev = this->end;
             this->end = temp;
         }
-        if (counterOfElements > this->size){//уже заполнен
+        if (counterOfElements > this->size){//уже заполнен.
+            //если добавляем 8. вся цепь сдвинется влево и на освободившееся встанет 8
+            //1 2 3 4 5
+            //2 3 4 5 8
             counterOfElements--;
             this->first = this->first->next;
             this->first->prev = nullptr;
@@ -87,20 +91,20 @@ public:
         }
     }
 
-    void pop_back(){
+    void delite_back(){
         if (end != nullptr){
             this->end = this->end->prev;
             this->counterOfElements--;
         }
     }
 
-    T operator [](int index){
-        if (index > counterOfElements){
+    T operator [](int where){
+        if (where > counterOfElements){
             exit(1);
         }
         Node* temp;
         temp = this->first;
-        for (int i = 0; i < index; i++){
+        for (int i = 0; i < where; i++){
             temp = temp->next;
         }
 
@@ -225,13 +229,13 @@ public:
 int main()
 {
     Buffer<int> t(9);
-    t.push_first(6);
-    t.push_first(0);
-    t.push_first(4);
-    t.push_back(7);
-    t.pop_back();
-    t.push_back(5);
-    t.pop_first();
+    t.insert_first(6);
+    t.insert_first(0);
+    t.insert_first(4);
+    t.insert_back(7);
+    t.delite_back();
+    t.insert_back(5);
+    t.delite_first();
     t.resize(10);
     t.resize(2);
     for (int i = 0; i < t.Size(); i++)
@@ -240,10 +244,10 @@ int main()
     }
     std::cout << std::endl;
     t.resize(5);
-    t.push_back(5);
-    t.push_back(9);
-    t.push_back(1);
-    t.push_back(4);
+    t.insert_back(5);
+    t.insert_back(9);
+    t.insert_back(1);
+    t.insert_back(4);
     for (int i = 0; i < t.Size(); i++){
         std::cout << t[i] << " ";
     }
@@ -255,4 +259,3 @@ int main()
     return 0;
 
 }
-
