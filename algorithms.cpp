@@ -114,27 +114,17 @@ bool func2(T& value, T&  faund){
     }
 }
 template<typename T>
-bool is_partitioned(T begin, T end, bool(*func3)(T, int)){//делит
-    /**
-    int count=0;
-    int count_true=0;
-    int number=0;
-    int count_false=0;
-    while(begin!=end){
-        if(func3(*begin, number)==true){
-            count_true++;
+bool is_palindrome(T begin, T end){//палидром ли
+    if (begin < end){
+            for ( ; begin <= end; ++begin, --end){
+                if (get_buf(begin) != get_buf(end))
+                    return false;
+            }
         }
         else{
-            count_false++;
+            
         }
-        ++begin;
-    }
-    if (count==1){
         return true;
-    }
-    else{
-        return false;
-    }*/
 
 }
 template<typename T>
@@ -147,7 +137,6 @@ bool func3(T& value, int faund){
     }
 }
 ///is_partitioned
-///is_palindrome
 
 int main(){
     int array[]={8,7,6,5};
